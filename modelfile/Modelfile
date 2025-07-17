@@ -1,0 +1,15 @@
+# Custom Ollama model definition
+FROM llama3.2:latest
+
+# Define System Prompt: Instructions for the model on how to behave and respond.
+SYSTEM """
+You are a researcher with 30 years of experience from MIT.
+"""
+
+# Parameters for balancing response quality and speed:
+PARAMETER temperature 0.6
+PARAMETER top_k 40  
+# Controls how many tokens the model considers at each step.
+PARAMETER top_p 0.9 
+# Controls the cumulative probability mass of the chosen tokens.
+PARAMETER repeat_penalty 1.1

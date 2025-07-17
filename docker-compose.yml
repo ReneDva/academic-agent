@@ -1,0 +1,111 @@
+services:
+  flask_app:
+    image: renedva/academic-agent:latest # pull image from docker hub instead of using 'build: .' every time.
+    ports:
+      - "5000:5000"
+    volumes:
+      - chroma_storage:/chroma/chroma
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    networks:
+      - app_network
+    depends_on:
+      ollama:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/
+      - OLLAMA_BASE_URL=http://ollama:11434/
+      - CHROMA_HOST=chromadb:8000
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./modelfile:/modelfile
+      - ollama_storage:/root/.ollama
+    networks:
+      - app_network
+    entrypoint: >
+      bash -c "
+        ollama serve &
+        sleep 10
+
+        echo 'Pulling embedding model: nomic-embed-text'
+        ollama pull nomic-embed-text
+
+        echo 'Creating custom model: my_llama3.2'
+        ollama create my_llama3.2 -f /modelfile/Modelfile
+      
+        echo 'Waiting for model to be available...'
+        while ! ollama list | grep my_llama3.2; do
+          echo 'Still waiting...'
+          sleep 5
+        done
+
+        echo 'Model is ready.'
+        tail -f /dev/null
+      "
+    healthcheck:
+      test: [ "CMD-SHELL", "ollama list | grep my_llama3.2 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_storage:/chroma/chroma
+    networks:
+      - app_network
+    healthcheck:
+      test: [ "CMD-SHELL", "bash -c '</dev/tcp/localhost/8000' && exit 0 || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app_network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  mongo-express:
+    image: mongo-express:latest
+    ports:
+      - "8081:8081"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=password
+    networks:
+      - app_network
+
+volumes:
+  chroma_storage:
+  ollama_storage:
+  mongo_data:
+
+networks:
+  app_network:
+    driver: bridge

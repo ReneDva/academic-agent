@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="he" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}"/>
+    <title>האפליקציה שלי</title>
+</head>
+<body>
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <header>
+        <h1>ברוכים הבאים לאפליקציה שלי</h1>
+    </header>
+
+    {# סעיף חדש להצגת תוצאת ה-AI (נשאר, למרות שהוא לא יופיע כאן לאחר השינוי האחרון) #}
+    {% if rag_result %}
+    <section class="rag-result-section">
+        <h2>תוצאת שאילתת AI:</h2>
+        <p>{{ rag_result }}</p>
+    </section>
+    {% endif %}
+    {# סוף סעיף תוצאת ה-AI #}
+
+    <section class="description">
+        <p>
+            licated quickly!
+        </p>
+    </section>
+
+    <section class="upload-form-section">
+        <h1>העלאת מסמך ופרטים</h1>
+
+        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+            <div>
+                <label for="pdfFile">בחר קובץ PDF:</label>
+                <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                <div id="message"></div>
+            </div>
+
+            <div>
+                <label for="input1">קלט 1:</label>
+                <input type="text" id="input1" name="input1" required placeholder="הזן כאן את הטקסט עבור קלט 1">
+            </div>
+
+            <div>
+                <label for="input2">קלט 2:</label>
+                <input type="text" id="input2" name="input2" required placeholder="הכנס נתונים רלוונטיים עבור קלט 2">
+            </div>
+
+            <div>
+                <label for="input3">קלט 3:</label>
+                <input type="text" id="input3" name="input3" required placeholder="ציין פרטים נוספים כאן">
+            </div>
+
+            <button type="submit">שמור / העלה קובץ</button>
+        </form>
+    </section>
+
+    {# NEW: Loading Animation/Message Section #}
+    <div id="loading-animation" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            {# This will be the spinning circle #}
+            <p>הסוכן שלנו עובד בשבילך... אנא המתן.</p>
+        </div>
+    </div>
+    {# End Loading Animation/Message Section #}
+
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function (event) {
+        const pdfInput = document.getElementById('pdfFile');
+        const file = pdfInput.files[0];
+        const messageDiv = document.getElementById('message');
+        const uploadForm = document.getElementById('uploadForm'); // Get the form element
+        const loadingAnimation = document.getElementById('loading-animation'); // Get the loading animation element
+
+        // איפוס הודעות קודמות
+        messageDiv.textContent = '';
+        messageDiv.className = '';
+
+        let isValid = true; // דגל למעקב אחר תקינות הטופס
+
+        if (!file) {
+            messageDiv.textContent = 'אנא בחר קובץ PDF להעלאה.';
+            messageDiv.classList.add('error');
+            isValid = false;
+        } else if (file.type !== 'application/pdf') {
+            messageDiv.textContent = 'שגיאה: ניתן להעלות קובצי PDF בלבד.';
+            messageDiv.classList.add('error');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault(); // מונע שליחת הטופס אם לא תקין
+        } else {
+            // אם הטופס תקין, הצג את אנימציית הטעינה והסתר את הטופס
+            uploadForm.style.display = 'none'; // הסתר את הטופס
+            loadingAnimation.style.display = 'flex'; // הצג את אנימציית הטעינה (שימוש ב-flex למרכוז)
+
+            // הטופס יישלח כעת באופן טבעי מכיוון שלא קראנו ל-preventDefault().
+            // השרת יטפל בעיבוד ובהפניה מחדש.
+        }
+    });
+</script>
+</body>
+</html>

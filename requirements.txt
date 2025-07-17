@@ -1,0 +1,26 @@
+# Flask and web framework dependencies
+Flask==2.3.3
+flask-restx==1.2.0
+Werkzeug==2.3.7
+
+# MongoDB database connectivity
+pymongo==4.5.0
+
+# PDF processing library
+PyPDF2==3.0.1
+
+# Timezone support
+pytz==2023.3
+
+# Environment configuration
+python-dotenv==1.0.0
+
+# Language model orchestration (LangChain)
+langchain==0.3.26
+langchain-chroma==0.2.3
+langchain-core==0.3.67
+langchain-ollama==0.3.3
+langchain-text-splitters==0.3.8
+
+# Data validation
+pydantic==2.11.7

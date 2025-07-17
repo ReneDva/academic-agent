@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="he" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}"/>
+    <title>תוצאות האפליקציה</title>
+</head>
+<body>
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <header>
+        <h1>תוצאת שאילתת AI</h1>
+    </header>
+
+    {% if rag_result %}
+    <section class="rag-result-section">
+        <h2>התשובה שנוצרה:</h2>
+        <pre>{{ rag_result }}</pre>
+    </section>
+    {% else %}
+    <section class="no-result-message">
+        <p>אין תוצאה זמינה כרגע. אנא חזור לדף הבית והעלה קובץ חדש.</p>
+    </section>
+    {% endif %}
+
+    <div class="back-link">
+        <p><a href="{{ url_for('index') }}">חזור לדף הבית</a></p>
+    </div>
+
+</div>
+</body>
+</html>
