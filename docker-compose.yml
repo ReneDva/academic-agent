@@ -1,6 +1,6 @@
 services:
   flask_app:
-    image: renedva/academic-agent:latest # pull image from docker hub instead of using 'build: .' every time.
+    build: . # or use 'image: renedva/academic-agent:latest' -> pull image from docker hub instead of using 'build: .' every time.
     ports:
       - "5000:5000"
     volumes:
