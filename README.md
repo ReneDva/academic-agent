@@ -3,6 +3,7 @@
 
 Academic Agent is a Flask-based REST API that allows users to upload academic PDF documents and ask natural language questions about their content.
 It uses Retrieval-Augmented Generation (RAG) with LangChain and Ollama to generate accurate, context-aware answers.
+
 ---
 
 ## 🔧 Features
