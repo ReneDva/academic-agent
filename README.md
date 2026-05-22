@@ -7,7 +7,7 @@ and ask natural language questions about their content. It uses Retrieval-Augmen
 (RAG) with LangChain and Ollama to generate accurate, context-aware answers.
 > See [System Architecture](app/SYSTEM_STATE.md) for the full component diagram and data flow.
 
-![Demo](assets\academic-agent-demo-ezgif.com-video-to-gif-converter.gif)
+![Demo](assets/academic-agent-demo-ezgif.com-video-to-gif-converter.gif)
 ---
 
 ## 🔧 Features
